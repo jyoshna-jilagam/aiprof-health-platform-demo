@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block content %}
+<h1>Appointment #{{ appt.id }}</h1>
+<div class="card">
+  <p><b>Date/Time:</b> {{ appt.slot_date }} at {{ appt.start_time }}</p>
+  <p><b>Status:</b> <span class="status {{ appt.status }}">{{ appt.status.replace('_',' ') }}</span></p>
+  <p><b>External record:</b> {{ appt.external_appointment_id or '—' }}</p>
+</div>
+<h2>Pre-visit questionnaire responses (authorized access only)</h2>
+{% for r in responses %}
+<div class="card">
+  <p><b>{{ r.q_name }}</b></p>
+  {% set answers = r.answers_json | from_json %}
+  <table>
+  {% for k, v in answers.items() %}<tr><td>{{ k }}</td><td>{{ v }}</td></tr>{% endfor %}
+  </table>
+</div>
+{% else %}<p class="small">No responses submitted yet.</p>{% endfor %}
+{% endblock %}

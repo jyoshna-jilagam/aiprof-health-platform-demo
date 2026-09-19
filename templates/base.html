@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}AI.Prof Health{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🩺 AI.Prof <span>Health</span></div>
+  {% if actor %}
+  <nav>
+    {% if actor.role == 'patient' %}
+      <a href="{{ url_for('patient_home') }}">Home</a>
+      <a href="{{ url_for('patient_ai') }}">AI Assistant</a>
+      <a href="{{ url_for('patient_preferences') }}">Preferences</a>
+      <a href="{{ url_for('demo_failure') }}">Failure Demo</a>
+    {% elif actor.role == 'doctor' %}
+      <a href="{{ url_for('doctor_home') }}">Appointments</a>
+      <a href="{{ url_for('doctor_availability') }}">Availability</a>
+    {% elif actor.role == 'hospital_admin' %}
+      <a href="{{ url_for('hospital_home') }}">Hospital Console</a>
+      <a href="{{ url_for('hospital_settings') }}">Configuration</a>
+    {% elif actor.role == 'platform_admin' %}
+      <a href="{{ url_for('platform_home') }}">Platform Console</a>
+      <a href="{{ url_for('hospital_onboarding') }}">Onboard Hospital</a>
+    {% endif %}
+  </nav>
+  <div class="who">{{ actor.name }} <span class="badge role">{{ actor.role.replace('_',' ') }}</span>
+    <a href="{{ url_for('logout') }}" class="logout">Logout</a></div>
+  {% endif %}
+</header>
+<main class="container">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}<div class="flash">{% for m in messages %}<p>{{ m }}</p>{% endfor %}</div>{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

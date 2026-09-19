@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% block content %}
+<h1>Welcome, {{ actor.name }}</h1>
+<p class="subtitle">Your appointments and pre-visit tasks</p>
+<div class="card">
+  <a class="btn" href="{{ url_for('patient_ai') }}">💬 Talk to the AI Assistant</a> <a class="btn secondary" href="{{ url_for('patient_preferences') }}">Profile & Preferences</a>
+</div>
+<h2>Your appointments</h2>
+<div class="card">
+<table>
+<tr><th>Date</th><th>Time</th><th>Doctor</th><th>Hospital</th><th>Status</th><th>Action</th></tr>
+{% for a in appts %}
+<tr>
+  <td>{{ a.slot_date }}</td><td>{{ a.start_time }}</td><td>Dr. {{ a.doctor_name }}</td><td>{{ a.hospital_name }}</td>
+  <td><span class="status {{ a.status }}">{{ a.status.replace('_',' ') }}</span></td>
+  <td>
+    {% if a.status in ['confirmed','rescheduled'] %}
+    <a class="btn secondary" href="{{ url_for('patient_questionnaire', appt_id=a.id) }}">Questionnaire</a>
+    <a class="btn secondary" href="{{ url_for('patient_reschedule', appt_id=a.id) }}">Reschedule</a>
+    <form class="inline" method="post" action="{{ url_for('patient_cancel', appt_id=a.id) }}">
+      <button class="btn danger">Cancel</button>
+    </form>
+    {% endif %}
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="6" class="small">No appointments yet - try the AI assistant above.</td></tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}

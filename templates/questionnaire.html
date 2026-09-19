@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% block content %}
+<h1>{{ q.name }}</h1>
+<p class="subtitle">Administrative pre-visit questions for your appointment on {{ appt.slot_date }}</p>
+<div class="card">
+<form method="post">
+  {% for question in q.questions %}
+    <label>{{ question.label }}</label>
+    {% if question.type == 'yes_no' %}
+      <select name="{{ question.id }}"><option>yes</option><option>no</option></select>
+    {% elif question.type == 'choice' %}
+      <select name="{{ question.id }}">{% for o in question.options %}<option>{{ o }}</option>{% endfor %}</select>
+    {% else %}
+      <input name="{{ question.id }}">
+    {% endif %}
+  {% endfor %}
+  <button class="btn" style="margin-top:16px">Submit</button>
+</form>
+</div>
+{% endblock %}

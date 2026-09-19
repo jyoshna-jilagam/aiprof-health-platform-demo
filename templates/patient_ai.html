@@ -1,0 +1,73 @@
+{% extends "base.html" %}{% block content %}
+<h1>AI Booking Assistant</h1>
+<p class="subtitle">Describe your concern in your own words. This assistant handles scheduling only - it never diagnoses or prescribes.</p>
+<div class="card">
+  <div id="chat" class="chat-box"></div>
+  <div class="chat-input">
+    <button id="mic" class="mic-btn" title="Speak">🎤</button>
+    <input id="msg" placeholder="e.g. I need an appointment for my shoulder pain this week" autocomplete="off">
+    <button class="btn" onclick="send()">Send</button>
+  </div>
+  <p class="small" style="margin-top:8px">
+    <label style="display:inline;margin:0"><input type="checkbox" id="simTimeout" style="width:auto"> Simulate EHR timeout after create (failure demo)</label>
+  </p>
+</div>
+<div id="trace"></div>
+
+<script>
+const chat = document.getElementById('chat');
+function addMsg(text, who, tag){
+  const d = document.createElement('div');
+  d.className = 'msg ' + who;
+  d.textContent = text;
+  chat.appendChild(d);
+  if(tag){ const t=document.createElement('div'); t.className='msg fallback-tag'; t.textContent=tag; chat.appendChild(t); }
+  chat.scrollTop = chat.scrollHeight;
+}
+function speak(text){
+  if('speechSynthesis' in window){
+    const u = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(u);
+  }
+}
+async function send(){
+  const input = document.getElementById('msg');
+  const text = input.value.trim();
+  if(!text) return;
+  addMsg(text, 'user');
+  input.value = '';
+  const simulate_timeout = document.getElementById('simTimeout').checked;
+  const res = await fetch('/api/chat', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({message: text, simulate_timeout})});
+  const data = await res.json();
+  addMsg(data.reply, 'ai', data.fallback ? '(deterministic fallback - no AI key configured)' : null);
+  speak(data.reply);
+  if(data.op_trace){
+    document.getElementById('trace').innerHTML =
+      '<h2>Operation trace</h2><div class="card"><pre class="trace">' +
+      JSON.stringify(data.op_trace, null, 2) + '</pre></div>';
+  }
+  document.getElementById('simTimeout').checked = false;
+}
+document.getElementById('msg').addEventListener('keydown', e=>{ if(e.key==='Enter') send(); });
+
+// Voice input via Web Speech API, with graceful fallback to text-only
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const micBtn = document.getElementById('mic');
+if(SpeechRecognition){
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US'; rec.interimResults = false;
+  let listening = false;
+  micBtn.onclick = () => {
+    if(listening){ rec.stop(); return; }
+    rec.start(); listening = true; micBtn.classList.add('listening');
+  };
+  rec.onresult = (e) => { document.getElementById('msg').value = e.results[0][0].transcript; send(); };
+  rec.onend = () => { listening = false; micBtn.classList.remove('listening'); };
+} else {
+  micBtn.title = 'Voice not supported in this browser - use text input';
+  micBtn.onclick = () => alert('Speech recognition is not supported in this browser. Please type your message.');
+}
+addMsg("Hi! Tell me your concern (e.g. \"shoulder pain this week\") and I'll help you find and book a doctor.", 'ai');
+</script>
+{% endblock %}

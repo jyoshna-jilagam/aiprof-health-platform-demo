@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block content %}
+<p><a class="btn secondary" href="{{ url_for('doctor_availability') }}">Manage Calendar & Availability</a></p>
+<h1>Dr. {{ actor.name }}'s Appointments</h1>
+<div class="card">
+<table>
+<tr><th>Date</th><th>Time</th><th>Patient</th><th>Status</th><th></th></tr>
+{% for a in appts %}
+<tr>
+  <td>{{ a.slot_date }}</td><td>{{ a.start_time }}</td><td>{{ a.patient_name }}</td>
+  <td><span class="status {{ a.status }}">{{ a.status.replace('_',' ') }}</span></td>
+  <td><a class="btn secondary" href="{{ url_for('doctor_appt', appt_id=a.id) }}">View</a></td>
+</tr>
+{% else %}<tr><td colspan="5" class="small">No appointments yet.</td></tr>{% endfor %}
+</table>
+</div>
+{% endblock %}

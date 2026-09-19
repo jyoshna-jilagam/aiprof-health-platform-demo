@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block content %}
+<div class="login-wrap">
+  <div class="card">
+    <h1>🩺 AI.Prof Health</h1>
+    <p class="subtitle">Multi-hospital intake, scheduling & voice agent</p>
+    {% with messages = get_flashed_messages() %}{% if messages %}<p style="color:#d64545">{{ messages[0] }}</p>{% endif %}{% endwith %}
+    <form method="post">
+      <label>Email</label><input name="email" required>
+      <label>Password</label><input name="password" type="password" required>
+      <button class="btn" style="margin-top:16px;width:100%">Sign in</button>
+    </form>
+    <p class="small" style="margin-top:14px">New patient? <a href="{{ url_for('register') }}">Create an account</a> · Hospital? <a href="{{ url_for('hospital_register') }}">Register your hospital</a></p>
+    <div class="demo-creds">
+      <b>Demo accounts</b> (password: <code>password123</code>)<br>
+      Platform admin: platform@aiprof.dev<br>
+      Hospital admin: admin@sunrise.dev / admin@lakeview.dev<br>
+      Doctor: ananya@doctor.dev (Sunrise Ortho)<br>
+      Patient: meera@patient.dev
+    </div>
+  </div>
+</div>
+{% endblock %}

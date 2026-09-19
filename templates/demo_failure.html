@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block content %}
+<h1>Required Failure Demo: EHR timeout after create</h1>
+<p class="subtitle">Creates a real appointment, forces a simulated timeout right after the Mock EHR
+persists the external record, then shows the automatic recovery using the stable idempotency key.</p>
+<div class="card">
+<form method="post">
+  <label>Doctor</label>
+  <select name="doctor_id">
+    {% for d in doctors %}<option value="{{ d.id }}">Dr. {{ d.name }} ({{ d.specialty }}) - {{ d.hospital_name }}</option>{% endfor %}
+  </select>
+  <button class="btn" style="margin-top:14px">Book next available slot with simulated timeout</button>
+</form>
+</div>
+{% if result %}
+<h2>Result</h2>
+<div class="card">
+  <p><b>Success:</b> {{ result.success }}</p>
+  {% if result.success %}
+  <p><b>Final appointment status:</b> <span class="status {{ result.data.appointment.status }}">{{ result.data.appointment.status }}</span></p>
+  <p><b>Verification:</b> {{ result.data.verification }}</p>
+  <p><b>Recovery:</b> {{ result.data.recovery }}</p>
+  <p><b>Reconciliation:</b> {{ result.data.reconciliation }}</p>
+  {% endif %}
+  <pre class="trace">{{ result | tojson(indent=2) }}</pre>
+</div>
+{% endif %}
+{% endblock %}

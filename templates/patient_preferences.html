@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block content %}
+<h1>Profile & Preferences</h1><div class="card"><p><b>{{ patient.name }}</b><br>{{ actor.email }}<br>{{ patient.phone or 'No phone on file' }}</p>
+<form method="post"><label>Full name</label><input name="name" value="{{ patient.name }}" required><label>Phone</label><input name="phone" value="{{ patient.phone or "" }}"><label>Date of birth</label><input type="date" name="dob" value="{{ patient.dob or "" }}"><label>Preferred appointment time</label><input name="preferred_time" value="{{ pref.preferred_time if pref else '' }}" placeholder="e.g. mornings">
+<label>Communication method</label><select name="communication_method"><option value="email">Email</option><option value="phone">Phone</option><option value="sms">SMS</option></select>
+<label>Notes / preferences</label><textarea name="notes">{{ pref.notes if pref else '' }}</textarea><button class="btn" style="margin-top:16px">Save Preferences</button></form></div>{% endblock %}

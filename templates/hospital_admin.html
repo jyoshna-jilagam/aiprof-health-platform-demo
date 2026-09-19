@@ -1,0 +1,54 @@
+{% extends "base.html" %}{% block content %}
+<h1>{{ hospital.name }} <span class="status {{ hospital.status }}">{{ hospital.status }}</span></h1>
+<div class="grid">
+  <div class="metric"><div class="num">{{ doctors|length }}</div><div class="label">Doctors</div></div>
+  <div class="metric"><div class="num">{{ appts|length }}</div><div class="label">Recent appointments</div></div>
+  <div class="metric"><div class="num">{{ workflows|length }}</div><div class="label">Workflows run</div></div>
+</div>
+
+<p><a class="btn secondary" href="{{ url_for('hospital_settings') }}">Hospital Configuration</a></p>
+<h2>Doctors</h2>
+<div class="card">
+<table>
+<tr><th>Name</th><th>Specialty</th><th>Duration</th><th>Status</th><th></th></tr>
+{% for d in doctors %}
+<tr><td>{{ d.name }}</td><td>{{ d.specialty }}</td><td>{{ d.duration_minutes }} min</td>
+  <td><span class="status {{ d.status }}">{{ d.status }}</span></td>
+  <td><a class="btn secondary" href="{{ url_for('hospital_doctor_availability', doctor_id=d.id) }}">Availability</a></td></tr>
+{% endfor %}
+</table>
+<h2 style="margin-top:18px">Add doctor</h2>
+<form method="post" action="{{ url_for('hospital_add_doctor') }}" class="two-col">
+  <div><label>Name</label><input name="name" required></div>
+  <div><label>Specialty</label><input name="specialty" required></div>
+  <div><label>Department</label><input name="department"></div>
+  <div><label>Appointment duration (min)</label><input name="duration_minutes" value="30" type="number"></div>
+  <div style="grid-column:1/-1"><button class="btn">Add doctor</button></div>
+</form>
+</div>
+
+<h2>Appointments</h2>
+<div class="card"><table>
+<tr><th>Date</th><th>Time</th><th>Doctor</th><th>Patient</th><th>Status</th></tr>
+{% for a in appts %}
+<tr><td>{{ a.slot_date }}</td><td>{{ a.start_time }}</td><td>{{ a.doctor_name }}</td><td>{{ a.patient_name }}</td>
+  <td><span class="status {{ a.status }}">{{ a.status.replace('_',' ') }}</span></td></tr>
+{% endfor %}
+</table></div>
+
+<h2>Integration activity (EHR operations)</h2>
+<div class="card"><table>
+<tr><th>Operation ID</th><th>Type</th><th>Status</th><th>Updated</th></tr>
+{% for o in ops %}
+<tr><td>{{ o.operation_id }}</td><td>{{ o.op_type }}</td><td><span class="status {{ o.status }}">{{ o.status }}</span></td><td>{{ o.updated_at }}</td></tr>
+{% endfor %}
+</table></div>
+
+<h2>Workflow executions</h2>
+<div class="card"><table>
+<tr><th>Type</th><th>Status</th><th>Updated</th></tr>
+{% for w in workflows %}
+<tr><td>{{ w.type }}</td><td><span class="status {{ w.status }}">{{ w.status }}</span></td><td>{{ w.updated_at }}</td></tr>
+{% endfor %}
+</table></div>
+{% endblock %}

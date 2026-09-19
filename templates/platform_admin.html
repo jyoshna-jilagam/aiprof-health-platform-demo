@@ -1,0 +1,49 @@
+{% extends "base.html" %}{% block content %}
+<h1>Platform Console</h1>
+<div class="grid">
+  <div class="metric"><div class="num">{{ metrics.hospitals }}</div><div class="label">Hospitals</div></div>
+  <div class="metric"><div class="num">{{ metrics.appointments }}</div><div class="label">Appointments</div></div>
+  <div class="metric"><div class="num">{{ metrics.confirmed }}</div><div class="label">Confirmed</div></div>
+  <div class="metric"><div class="num">{{ metrics.reconciliation_open }}</div><div class="label">Open reconciliations</div></div>
+  <div class="metric"><div class="num">{{ metrics.ehr_unknown }}</div><div class="label">Unknown EHR outcomes</div></div>
+  <div class="metric"><div class="num">{{ metrics.ai_actions }}</div><div class="label">AI capability actions</div></div>
+  <div class="metric"><div class="num">{{ metrics.workflow_completed }}</div><div class="label">Completed workflows</div></div>
+  <div class="metric"><div class="num">{{ metrics.booking_failures }}</div><div class="label">Booking failures</div></div>
+</div>
+
+<p><a class="btn" href="{{ url_for('hospital_onboarding') }}">+ New Hospital Application</a></p>
+<h2>Hospitals</h2>
+<div class="card"><table>
+<tr><th>Name</th><th>Status</th><th>Change</th></tr>
+{% for h in hospitals %}
+<tr><td>{{ h.name }}</td><td><span class="status {{ h.status }}">{{ h.status }}</span></td>
+<td>
+<form method="post" action="{{ url_for('platform_hospital_status', hospital_id=h.id) }}" class="inline">
+  <select name="status" onchange="this.form.submit()" style="width:auto">
+    {% for s in ['draft','submitted','under_review','approved','rejected','suspended'] %}
+    <option value="{{ s }}" {% if s==h.status %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+</form>
+</td></tr>
+{% endfor %}
+</table></div>
+
+<h2>Reconciliation / Human escalation</h2>
+<div class="card"><table>
+<tr><th>Appointment</th><th>Status</th><th>Details</th><th></th></tr>
+{% for r in recon %}
+<tr><td>#{{ r.appointment_id }}</td><td><span class="status {{ r.status }}">{{ r.status }}</span></td><td>{{ r.details }}</td>
+<td>{% if r.status != 'resolved' %}<form method="post" action="{{ url_for('platform_resolve', rec_id=r.id) }}" class="inline">
+  <button class="btn secondary">Mark resolved</button></form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="4" class="small">No reconciliation records.</td></tr>{% endfor %}
+</table></div>
+
+<h2>Audit log</h2>
+<div class="card"><table>
+<tr><th>When</th><th>Actor</th><th>Role</th><th>Action</th><th>Entity</th></tr>
+{% for a in audit %}
+<tr><td>{{ a.created_at }}</td><td>{{ a.actor }}</td><td>{{ a.role }}</td><td>{{ a.action }}</td><td>{{ a.entity_type }} {{ a.entity_id }}</td></tr>
+{% endfor %}
+</table></div>
+{% endblock %}

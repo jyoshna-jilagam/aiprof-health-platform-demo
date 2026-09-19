@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block content %}
+<h1>Reschedule Appointment</h1>
+<div class="card"><p>Current: {{ appt.slot_date }} at {{ appt.start_time }}</p><form method="post">
+<label>Choose a new available slot</label><select name="slot_index" required>{% for s in slots %}<option value="{{ loop.index0 }}">{{ s.date }} at {{ s.start_time }}</option>{% endfor %}</select>
+<button class="btn" style="margin-top:16px">Reschedule & Verify</button></form></div>
+{% if not slots %}<p>No alternative slots are available in the next 7 days.</p>{% endif %}
+{% endblock %}

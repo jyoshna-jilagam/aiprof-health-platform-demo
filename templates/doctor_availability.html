@@ -1,0 +1,32 @@
+{% extends "base.html" %}{% block content %}
+<h1>Availability - Dr. {{ doctor.name }}</h1>
+<div class="two-col">
+<div class="card">
+  <h2 style="margin-top:0">Working hours</h2>
+  <table><tr><th>Weekday</th><th>Start</th><th>End</th></tr>
+  {% for a in avail %}<tr><td>{{ ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][a.weekday] }}</td><td>{{ a.start_time }}</td><td>{{ a.end_time }}</td></tr>{% endfor %}
+  </table>
+  <form method="post" style="margin-top:14px">
+    <label>Weekday</label>
+    <select name="weekday"><option value="0">Mon</option><option value="1">Tue</option><option value="2">Wed</option>
+      <option value="3">Thu</option><option value="4">Fri</option><option value="5">Sat</option><option value="6">Sun</option></select>
+    <label>Start</label><input type="time" name="start_time" value="09:00" required>
+    <label>End</label><input type="time" name="end_time" value="13:00" required>
+    <button class="btn" style="margin-top:12px">Add working hours</button>
+  </form>
+</div>
+<div class="card">
+  <h2 style="margin-top:0">Blocked slots</h2>
+  <table><tr><th>Date</th><th>Start</th><th>End</th><th>Reason</th></tr>
+  {% for b in blocked %}<tr><td>{{ b.date }}</td><td>{{ b.start_time }}</td><td>{{ b.end_time }}</td><td>{{ b.reason }}</td></tr>{% endfor %}
+  </table>
+  <form method="post" action="{{ url_for('hospital_block_slot', doctor_id=doctor.id) }}" style="margin-top:14px">
+    <label>Date</label><input type="date" name="date" required>
+    <label>Start</label><input type="time" name="start_time" required>
+    <label>End</label><input type="time" name="end_time" required>
+    <label>Reason</label><input name="reason" placeholder="e.g. leave">
+    <button class="btn" style="margin-top:12px">Block slot</button>
+  </form>
+</div>
+</div>
+{% endblock %}
